@@ -11,7 +11,6 @@
 // Execute `rustlings hint iterators5` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
 
 use std::collections::HashMap;
 
@@ -24,6 +23,7 @@ enum Progress {
 
 fn count_for(map: &HashMap<String, Progress>, value: Progress) -> usize {
     let mut count = 0;
+    // rust在比较两个引用的时候，会自动解引用去比较对应的值（前提是实现了partialEq这个trait）
     for val in map.values() {
         if val == &value {
             count += 1;
@@ -35,7 +35,8 @@ fn count_for(map: &HashMap<String, Progress>, value: Progress) -> usize {
 fn count_iterator(map: &HashMap<String, Progress>, value: Progress) -> usize {
     // map is a hashmap with String keys and Progress values.
     // map = { "variables1": Complete, "from_str": None, ... }
-    todo!();
+    // 闭包中这里直接使用&&val表示传进来proc的双重引用，在用val的时候，就是解了两次引用的值
+    map.values().filter(|&&val| val == value).count()
 }
 
 fn count_collection_for(collection: &[HashMap<String, Progress>], value: Progress) -> usize {
@@ -54,7 +55,8 @@ fn count_collection_iterator(collection: &[HashMap<String, Progress>], value: Pr
     // collection is a slice of hashmaps.
     // collection = [{ "variables1": Complete, "from_str": None, ... },
     //     { "variables2": Complete, ... }, ... ]
-    todo!();
+    // flat_map 方法接受一个闭包作为参数，并将每个 HashMap 的值迭代器展平为一个单一的迭代器。
+    collection.iter().flat_map(|map| map.values()).filter(|&&v| v == value).count()
 }
 
 #[cfg(test)]

@@ -2,7 +2,6 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -11,6 +10,7 @@ use std::vec::*;
 #[derive(Debug)]
 struct Node<T> {
     val: T,
+    // NonNull声明一个指向node的非空指针，这样就不需要检查是否为空
     next: Option<NonNull<Node<T>>>,
 }
 
@@ -69,14 +69,49 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
-	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+	
+}
+
+impl<T> LinkedList<T> where T:PartialOrd + Clone {
+    pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self {
+        let mut merged_list = LinkedList::<T>::new();
+
+        let mut cur_a = list_a.start;
+		let mut cur_b = list_b.start;
+
+        while let (Some(a_np), Some(b_np)) = (cur_a, cur_b) {
+            unsafe {
+                let ap = a_np.as_ptr();
+                let bp = b_np.as_ptr();
+
+                if (*ap).val < (*bp).val {
+                    merged_list.add((*ap).val.clone());
+                    cur_a = (*ap).next;
+                } else {
+                    merged_list.add((*bp).val.clone());
+                    cur_b = (*bp).next;
+                }
+            }
         }
+
+        while let Some(a_np) = cur_a {
+            unsafe {
+                let ap = a_np.as_ptr();
+                merged_list.add((*ap).val.clone());
+                cur_a = (*ap).next;
+            }
+        }
+
+        while let Some(b_np) = cur_b {
+            unsafe {
+                let bp = b_np.as_ptr();
+                merged_list.add((*bp).val.clone());
+                cur_b = (*bp).next;
+            }
+        }
+
+        merged_list
+
 	}
 }
 
